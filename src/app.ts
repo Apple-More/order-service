@@ -11,7 +11,7 @@ app.use(express.json());
 
 // API routes
 app.get("/health", (req: Request, res: Response) => {
-  res.status(200).json({ status: "UP" });
+  res.status(200).json({ status: "Order service is online" });
 });
 
 // 404 handler for unknown routes
