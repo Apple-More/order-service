@@ -14,21 +14,23 @@ datasource db {
 }
 
 model Order {
-  order_id    String   @id @default(uuid())
-  created_date_time DateTime @default(now())
-  updated_date_time DateTime @updatedAt
-  order_status ORDER_STATUS
-  payment_id String?
-  customer_id String
+  order_id          String      @id @default(uuid())
+  created_date_time DateTime    @default(now())
+  updated_date_time DateTime    @updatedAt
+  order_status      ORDER_STATUS
+  payment_id        String?
+  customer_id       String
   shipping_address_id String
+  order_items       OrderItem[] @relation("OrderItems")
 }
 
 model OrderItem {
-  order_item_id String @id @default(uuid())
-  order_id String
+  order_item_id     String    @id @default(uuid())
+  order_id          String
   product_variant_id String
-  quantity Int
-  price Decimal
+  quantity          Int
+  price             Decimal
+  order             Order     @relation("OrderItems", fields: [order_id], references: [order_id])
 }
 
 enum ORDER_STATUS {

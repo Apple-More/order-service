@@ -1,12 +1,20 @@
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 const prisma = new PrismaClient();
 
-prisma
-  .$connect()
-  .then(() => console.log("Connected to database"))
-  .catch((error) => console.error("Database connection error:", error));
+// Connecting to the database before running tests
+beforeAll(async () => {
+  await prisma.$connect();
+  console.log("Connected to the database");
+});
+
+// Disconnecting Prisma after tests
+afterAll(async () => {
+  await prisma.$disconnect();
+  console.log("Disconnected from the database");
+});
 
 export default prisma;
