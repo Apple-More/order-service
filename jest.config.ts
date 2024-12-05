@@ -5,6 +5,10 @@ const config: Config = {
   testEnvironment: 'node',
   testMatch: ['**/tests/**/*.test.ts'], // Look for test files in a 'tests' folder with '.test.ts' suffix
   moduleFileExtensions: ['ts', 'js'],
+  reporters: [
+    'default',
+    ['jest-ctrf-json-reporter', {}],
+  ],
 };
 
 export default config;
