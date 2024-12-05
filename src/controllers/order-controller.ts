@@ -88,7 +88,9 @@ export const createOrder = async (
   try {
     const response = await checkAvailabilityAndGetPrice(orderItems);
 
-    const { variantDetails, amount } = response.data.data;
+    const { variantDetails, amount } = (
+      response.data as { data: { variantDetails: any; amount: number } }
+    ).data;
 
     const newOrder = await prisma.order.create({
       data: {
@@ -104,7 +106,9 @@ export const createOrder = async (
 
     const paymentIntent = await createPaymentIntent(amount);
 
-    const { client_secret } = paymentIntent.data;
+    const { client_secret } = (
+      paymentIntent as { data: { client_secret: string } }
+    ).data;
 
     return res.status(201).json({
       status: true,
