@@ -1,14 +1,15 @@
 import axios from "axios";
+import { API_GATEWAY_URL } from "../config";
 
 const axiosInstance = axios.create({
   timeout: 10000,
 });
 
-const BASE_URL = "http://localhost:8080/api/";
+const BASE_URL = API_GATEWAY_URL;
 
 const SERVICES_URL = {
-  PRODUCT_SERVICE_URL: "products",
-  PAYMENT_SERVICE_URL: "payments",
+  PRODUCT_SERVICE_URL: "product-service",
+  PAYMENT_SERVICE_URL: "payment-service",
 };
 
 export const routes = {
