@@ -12,8 +12,8 @@ app.use(helmet());
 app.use(express.json());
 
 // API routes
-app.get("/health", (req: Request, res: Response) => {
-  res.status(200).json({ status: "UP" });
+app.get("/public/health", (req: Request, res: Response) => {
+  res.status(200).json({ status: "Order service is Online" });
 });
 
 app.use("/v1", router);

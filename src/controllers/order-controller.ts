@@ -117,3 +117,135 @@ export const createOrder = async (
       .json({ status: false, data: null, message: error.message });
   }
 };
+
+interface RequestWithUser extends Request {
+  user?: {
+    userRole: string;
+    userId: string;
+    userName: string;
+    email: string;
+  };
+}
+
+export const confirmOrderPayment = async (
+  req: RequestWithUser,
+  res: Response,
+): Promise<any> => {
+  const { order_id } = req.params;
+
+  if (!order_id) {
+    return res.status(400).json({
+      status: false,
+      data: null,
+      message: "Order ID is required",
+    });
+  }
+
+  const userHeader = req.headers["user"];
+
+  if (userHeader) {
+    try {
+      const { user } = JSON.parse(userHeader as string);
+      req.user = user;
+    } catch (error) {
+      res.status(400).json({
+        status: false,
+        data: {},
+        error: "Invalid user header format",
+      });
+    }
+  }
+
+  const customer_id = req.user?.userId;
+
+  try {
+    const order = await prisma.order.findUnique({
+      where: { order_id, customer_id },
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        status: false,
+        data: null,
+        message: "Order not found",
+      });
+    }
+
+    await prisma.order.update({
+      where: { order_id },
+      data: { order_status: "payment_completed" },
+    });
+
+    const orderWithItems = await prisma.order.findUnique({
+      where: { order_id },
+      include: { order_items: true },
+    });
+
+    return res.status(200).json({
+      status: true,
+      data: orderWithItems,
+      message: "Order payment confirmed",
+    });
+  } catch (error: any) {
+    return res
+      .status(500)
+      .json({ status: false, data: null, message: error.message });
+  }
+};
+
+export const getAllOrders = async (
+  req: Request,
+  res: Response,
+): Promise<any> => {
+  try {
+    const orders = await prisma.order.findMany();
+
+    return res.status(200).json({
+      status: true,
+      data: orders,
+      message: "All orders retrieved",
+    });
+  } catch (error: any) {
+    return res
+      .status(500)
+      .json({ status: false, data: null, message: error.message });
+  }
+};
+
+export const getOrdersByUser = async (
+  req: RequestWithUser,
+  res: Response,
+): Promise<any> => {
+  const userHeader = req.headers["user"];
+
+  if (userHeader) {
+    try {
+      const { user } = JSON.parse(userHeader as string);
+      req.user = user;
+    } catch (error) {
+      res.status(400).json({
+        status: false,
+        data: {},
+        error: "Invalid user header format",
+      });
+    }
+  }
+
+  const customer_id = req.user?.userId;
+
+  try {
+    const orders = await prisma.order.findMany({
+      where: { customer_id },
+    });
+
+    return res.status(200).json({
+      status: true,
+      data: orders,
+      message: "All orders retrieved",
+    });
+  } catch (error: any) {
+    return res
+      .status(500)
+      .json({ status: false, data: null, message: error.message });
+  }
+};
