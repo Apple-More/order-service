@@ -17,9 +17,8 @@ model Order {
   order_id    String   @id @default(uuid())
   created_date_time DateTime @default(now())
   updated_date_time DateTime @updatedAt
-  order_status String
-  payment_id String
-  admin_id String
+  order_status ORDER_STATUS
+  payment_id String?
   customer_id String
   shipping_address_id String
 }
@@ -30,4 +29,11 @@ model OrderItem {
   product_variant_id String
   quantity Int
   price Decimal
+}
+
+enum ORDER_STATUS {
+  payment_pending
+  payment_completed
+  shipped
+  cancelled
 }
