@@ -9,7 +9,7 @@ import {
 const router = Router();
 
 router.post("/", createOrder);
-router.get("/:order_id", confirmOrderPayment);
+router.patch("/:order_id", confirmOrderPayment);
 router.get("/user", getOrdersByUser);
 router.get("/", getAllOrders);
 
