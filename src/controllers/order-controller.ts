@@ -136,6 +136,7 @@ export const confirmOrderPayment = async (
   res: Response,
 ): Promise<any> => {
   const { order_id } = req.params;
+  const { order_status } = req.body;
 
   if (!order_id) {
     return res.status(400).json({
@@ -177,7 +178,7 @@ export const confirmOrderPayment = async (
 
     await prisma.order.update({
       where: { order_id },
-      data: { order_status: "payment_completed" },
+      data: { order_status: order_status },
     });
 
     const orderWithItems = await prisma.order.findUnique({
