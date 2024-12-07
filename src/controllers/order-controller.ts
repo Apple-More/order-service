@@ -1,6 +1,5 @@
 import prisma from "../config/prisma";
 import { Request, Response } from "express";
-
 import { createPaymentIntent, checkAvailabilityAndGetPrice } from "../utils";
 
 interface OrderItem {
@@ -116,6 +115,7 @@ export const createOrder = async (
       message: "Order created successfully",
     });
   } catch (error: any) {
+    console.error("Error in createOrder:", error.message);
     return res
       .status(500)
       .json({ status: false, data: null, message: error.message });
@@ -153,7 +153,7 @@ export const confirmOrderPayment = async (
       const { user } = JSON.parse(userHeader as string);
       req.user = user;
     } catch (error) {
-      res.status(400).json({
+      return res.status(400).json({
         status: false,
         data: {},
         error: "Invalid user header format",
@@ -192,6 +192,7 @@ export const confirmOrderPayment = async (
       message: "Order payment confirmed",
     });
   } catch (error: any) {
+    console.error("Error in confirmOrderPayment:", error.message);
     return res
       .status(500)
       .json({ status: false, data: null, message: error.message });
@@ -211,6 +212,7 @@ export const getAllOrders = async (
       message: "All orders retrieved",
     });
   } catch (error: any) {
+    console.error("Error in getAllOrders:", error.message);
     return res
       .status(500)
       .json({ status: false, data: null, message: error.message });
@@ -223,20 +225,34 @@ export const getOrdersByUser = async (
 ): Promise<any> => {
   const userHeader = req.headers["user"];
 
-  if (userHeader) {
-    try {
-      const { user } = JSON.parse(userHeader as string);
-      req.user = user;
-    } catch (error) {
-      res.status(400).json({
-        status: false,
-        data: {},
-        error: "Invalid user header format",
-      });
-    }
+  if (!userHeader) {
+    return res.status(400).json({
+      status: false,
+      data: {},
+      error: "User header is required",
+    });
+  }
+
+  try {
+    const { user } = JSON.parse(userHeader as string);
+    req.user = user;
+  } catch (error) {
+    return res.status(400).json({
+      status: false,
+      data: {},
+      error: "Invalid user header format",
+    });
   }
 
   const customer_id = req.user?.userId;
+
+  if (!customer_id) {
+    return res.status(400).json({
+      status: false,
+      data: {},
+      error: "User ID is required",
+    });
+  }
 
   try {
     const orders = await prisma.order.findMany({
@@ -249,6 +265,7 @@ export const getOrdersByUser = async (
       message: "All orders retrieved",
     });
   } catch (error: any) {
+    console.error("Error in getOrdersByUser:", error.message);
     return res
       .status(500)
       .json({ status: false, data: null, message: error.message });
