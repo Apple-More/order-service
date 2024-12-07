@@ -14,6 +14,7 @@ const SERVICES_URL = {
 export const routes = {
   products: {
     "check-availability-and-get-price": `${BASE_URL}${SERVICES_URL.PRODUCT_SERVICE_URL}/v1/product-variant-prices`,
+    "get-product-variant-by-id": `${BASE_URL}${SERVICES_URL.PRODUCT_SERVICE_URL}/v1/cart-item-service`,
   },
   payments: {
     "create-payment-intent": `${BASE_URL}${SERVICES_URL.PAYMENT_SERVICE_URL}/v1/public/payment-intent`,
@@ -57,6 +58,17 @@ export const getCustomerById = async (customerId: string) => {
   try {
     const response = await axiosInstance.get(
       `${routes.users["get-user-by-id"]}/${customerId}`,
+    );
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+export const getProductVariantById = async (productVariantId: string) => {
+  try {
+    const response = await axiosInstance.get(
+      `${routes.products["get-product-variant-by-id"]}/${productVariantId}`,
     );
     return response.data;
   } catch (error: any) {

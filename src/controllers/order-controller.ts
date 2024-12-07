@@ -4,6 +4,7 @@ import {
   createPaymentIntent,
   checkAvailabilityAndGetPrice,
   getCustomerById,
+  getProductVariantById,
 } from "../utils";
 
 interface OrderItem {
@@ -215,6 +216,17 @@ export const getAllOrders = async (
     const ordersWithCustomers = await Promise.all(
       orders.map(async (order) => {
         const customer = await getCustomerById(order.customer_id);
+        order.order_items.map(async (item) => {
+          const productVariant = await getProductVariantById(
+            item.product_variant_id,
+          );
+          return {
+            ...item,
+            ...(productVariant && (productVariant as any).data
+              ? (productVariant as any).data
+              : {}),
+          };
+        });
         const totalAmount = order.order_items.reduce(
           (acc: number, item) =>
             acc + Number(item.price) * Number(item.quantity),
