@@ -1,6 +1,10 @@
 import prisma from "../config/prisma";
 import { Request, Response } from "express";
-import { createPaymentIntent, checkAvailabilityAndGetPrice } from "../utils";
+import {
+  createPaymentIntent,
+  checkAvailabilityAndGetPrice,
+  getCustomerById,
+} from "../utils";
 
 interface OrderItem {
   order_item_id: string;
@@ -204,11 +208,29 @@ export const getAllOrders = async (
   res: Response,
 ): Promise<any> => {
   try {
-    const orders = await prisma.order.findMany();
+    const orders = await prisma.order.findMany({
+      include: { order_items: true },
+    });
+
+    const ordersWithCustomers = await Promise.all(
+      orders.map(async (order) => {
+        const customer = await getCustomerById(order.customer_id);
+        const totalAmount = order.order_items.reduce(
+          (acc: number, item) =>
+            acc + Number(item.price) * Number(item.quantity),
+          0,
+        );
+        return {
+          ...order,
+          ...(customer && (customer as any).data ? (customer as any).data : {}),
+          totalAmount,
+        };
+      }),
+    );
 
     return res.status(200).json({
+      data: ordersWithCustomers,
       status: true,
-      data: orders,
       message: "All orders retrieved",
     });
   } catch (error: any) {
@@ -257,6 +279,15 @@ export const getOrdersByUser = async (
   try {
     const orders = await prisma.order.findMany({
       where: { customer_id },
+      include: { order_items: true },
+    });
+
+    orders.map((order) => {
+      const totalAmount = order.order_items.reduce(
+        (acc: number, item) => acc + Number(item.price) * Number(item.quantity),
+        0,
+      );
+      return { ...order, totalAmount };
     });
 
     return res.status(200).json({
