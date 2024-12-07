@@ -34,6 +34,7 @@ jobs:
           docker build \
             --build-arg PORT=${{ secrets.PORT }} \
             --build-arg DATABASE_URL=${{ secrets.DATABASE_URL }} \
+            --build-arg API_GATEWAY_URL=${{ secrets.API_GATEWAY_URL }} \
             -t ${{ secrets.ACR_LOGIN_SERVER }}/order-service:latest .
 
       # Push the Docker image to Azure Container Registry

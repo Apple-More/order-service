@@ -39,10 +39,12 @@ RUN npx prisma generate
 # Accept build arguments for PORT and DATABASE_URL
 ARG PORT
 ARG DATABASE_URL
+ARG API_GATEWAY_URL
 
 # Set environment variables
 ENV PORT=${PORT}
 ENV DATABASE_URL=${DATABASE_URL}
+ENV API_GATEWAY_URL=${API_GATEWAY_URL}
 
 # Expose the application port
 EXPOSE ${PORT}
