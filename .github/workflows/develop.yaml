@@ -12,6 +12,7 @@ permissions:
 env:
   PORT: ${{ secrets.PORT }}
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  API_GATEWAY_URL: ${{ secrets.API_GATEWAY_URL }}
   
 jobs:
   jest-test:

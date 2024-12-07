@@ -17,7 +17,7 @@ export const routes = {
     "check-availability-and-get-price": `${BASE_URL}${SERVICES_URL.PRODUCT_SERVICE_URL}/v1/product-variant-prices`,
   },
   payments: {
-    "create-payment-intent": `${BASE_URL}${SERVICES_URL.PAYMENT_SERVICE_URL}/v1/customer/payment-intent`,
+    "create-payment-intent": `${BASE_URL}${SERVICES_URL.PAYMENT_SERVICE_URL}/v1/public/payment-intent`,
   },
 };
 
