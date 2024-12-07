@@ -215,26 +215,33 @@ export const getAllOrders = async (
 
     const ordersWithCustomers = await Promise.all(
       orders.map(async (order) => {
+        // Fetch customer details
         const customer = await getCustomerById(order.customer_id);
-        order.order_items.map(async (item) => {
-          const productVariant = await getProductVariantById(
-            item.product_variant_id,
-          );
-          return {
-            ...item,
-            ...(productVariant && (productVariant as any).data
-              ? (productVariant as any).data
-              : {}),
-          };
-        });
-        const totalAmount = order.order_items.reduce(
-          (acc: number, item) =>
-            acc + Number(item.price) * Number(item.quantity),
-          0,
+
+        // Process order items
+        order.order_items = await Promise.all(
+          order.order_items.map(async (item) => {
+            const productVariant = await getProductVariantById(
+              item.product_variant_id,
+            );
+            return {
+              ...item,
+              ...(productVariant ? productVariant : {}),
+            };
+          }),
         );
+
+        // Calculate total amount
+        const totalAmount = order.order_items.reduce((acc: number, item) => {
+          const price = Number(item.price) || 0;
+          const quantity = Number(item.quantity) || 0;
+          return acc + price * quantity;
+        }, 0);
+
+        // Return order with customer details and total amount
         return {
           ...order,
-          ...(customer && (customer as any).data ? (customer as any).data : {}),
+          ...(customer ? customer : {}),
           totalAmount,
         };
       }),
