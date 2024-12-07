@@ -1,15 +1,14 @@
 import axios from "axios";
 import { API_GATEWAY_URL } from "../config";
 
-const axiosInstance = axios.create({
-  timeout: 10000,
-});
+const axiosInstance = axios.create({});
 
 const BASE_URL = API_GATEWAY_URL;
 
 const SERVICES_URL = {
   PRODUCT_SERVICE_URL: "product-service",
   PAYMENT_SERVICE_URL: "payment-service",
+  USER_SERVICE_URL: "user-service",
 };
 
 export const routes = {
@@ -18,6 +17,9 @@ export const routes = {
   },
   payments: {
     "create-payment-intent": `${BASE_URL}${SERVICES_URL.PAYMENT_SERVICE_URL}/v1/public/payment-intent`,
+  },
+  users: {
+    "get-user-by-id": `${BASE_URL}${SERVICES_URL.USER_SERVICE_URL}/v1/customers`,
   },
 };
 
@@ -45,6 +47,17 @@ export const createPaymentIntent = async (amount: number) => {
       },
     );
 
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+export const getCustomerById = async (customerId: string) => {
+  try {
+    const response = await axiosInstance.get(
+      `${routes.users["get-user-by-id"]}/${customerId}`,
+    );
     return response.data;
   } catch (error: any) {
     throw new Error(error.message);
