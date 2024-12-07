@@ -5,16 +5,14 @@ dotenv.config();
 
 const prisma = new PrismaClient();
 
-// Connecting to the database before running tests
-beforeAll(async () => {
+export const connectDB = async () => {
   await prisma.$connect();
-  console.log("Connected to the database");
-});
+  console.log('Connected to database');
+};
 
-// Disconnecting Prisma after tests
-afterAll(async () => {
+export const disconnectDB = async () => {
   await prisma.$disconnect();
-  console.log("Disconnected from the database");
-});
+  console.log('Disconnected from database');
+};
 
 export default prisma;
