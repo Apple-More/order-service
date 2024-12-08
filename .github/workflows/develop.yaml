@@ -1,0 +1,40 @@
+name: Automate Testing
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+permissions:
+  pull-requests: write
+  contents: read
+
+env:
+  PORT: ${{ secrets.PORT }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  API_GATEWAY_URL: ${{ secrets.API_GATEWAY_URL }}
+  
+jobs:
+  jest-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Jest tests
+        run: npm test
+        
+      - name: Publish Test Summary Results
+        run: npx github-actions-ctrf pull-request ctrf/ctrf-report.json
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
